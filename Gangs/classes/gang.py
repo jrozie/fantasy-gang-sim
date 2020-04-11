@@ -1,3 +1,4 @@
+#%%
 import random
 from classes.racket import Racket
 from classes.asset import Asset
@@ -87,6 +88,10 @@ class Gang:
                 return False
         return True
 
+    # Gets Gang Strength
+    def get_strength(self):
+        return len(self.members)
+
     # List the members and their stats
     def get_status(self):
         print(f'{self.name}\nRoster:')
@@ -152,3 +157,6 @@ class Gang:
         member.gang = None
         del(self.members[member.id])
         return True
+
+
+# %%
