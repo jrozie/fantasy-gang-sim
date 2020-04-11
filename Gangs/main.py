@@ -8,10 +8,11 @@ from classes.namebase import Namebase
 from classes.gang import Gang
 from classes.member import Member
 from classes.racket import Racket
+from classes.asset import Asset
 
 
-def main():
-    gang1 = Gang('da dorfs')
+# def main():
+gang1 = Gang('da dorfs')
 
 # %%
 

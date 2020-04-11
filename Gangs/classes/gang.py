@@ -1,4 +1,6 @@
+import random
 from classes.racket import Racket
+from classes.asset import Asset
 from classes.member import Member
 
 class Gang:
@@ -13,6 +15,7 @@ class Gang:
         self.name = name
         self.members = {}
         self.rackets = {}
+        self.assets = {}
         
         self.recruit(initial_members)
 
@@ -30,7 +33,12 @@ class Gang:
         racket = Racket(self)
         self.rackets[racket.id] = racket
 
-    # sources money from rackets to pay for things
+    # creates a new asset that stores cash/gear
+    def add_asset(self):
+        asset = Asset(self)
+        self.assets[asset.id] = asset
+
+    # sources money from assets to pay for things
     def spend(self, amount):
         if self.count_cash() >= amount:
             #can spend
@@ -46,11 +54,16 @@ class Gang:
         else:
             return False
 
+    # store money in an asset
+    def earn(self, amount):
+        store_in = self.assets[random.choice(filter(lambda x: self.assets[x].can_store_cash))]
+        print(store_in)
+
     # get total cash reserves
     def count_cash(self):
         cash = 0
-        for n in self.rackets:
-            cash += self.rackets[n].cash
+        for n in self.assets:
+            cash += self.assets[n].cash
         return cash
 
     # Add [n] new members to self.members
