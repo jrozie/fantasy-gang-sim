@@ -17,6 +17,9 @@ class Gang:
         self.rackets = {}
         self.assets = {}
         
+        self.add_asset()
+        self.add_racket()
+        self.earn(initial_members*3)
         self.recruit(initial_members)
 
         self.boss = self.members[max(self.members, key=lambda x: self.members[x].level)]
@@ -43,7 +46,7 @@ class Gang:
         if self.count_cash() >= amount:
             #can spend
             while amount > 0:
-                spend_from = self.rackets[max(self.rackets, key=lambda  x: self.rackets[x].cash)]
+                spend_from = self.assets[max(self.assets, key=lambda  x: self.assets[x].cash)]
                 if spend_from.cash >= amount:
                     spend_from.cash -= amount
                     amount = 0
@@ -56,8 +59,15 @@ class Gang:
 
     # store money in an asset
     def earn(self, amount):
-        store_in = self.assets[random.choice(filter(lambda x: self.assets[x].can_store_cash))]
-        print(store_in)
+        stash_assets = []
+        for asset_id in self.assets:
+            if self.assets[asset_id].can_store_cash:
+                stash_assets.append(asset_id)
+        if len(stash_assets) > 0:
+            self.assets[random.choice(stash_assets)].cash += amount
+            return True
+        else:
+            return False
 
     # get total cash reserves
     def count_cash(self):
@@ -68,10 +78,14 @@ class Gang:
 
     # Add [n] new members to self.members
     # Costs 1 cash
-    def recruit(self, n):
+    def recruit(self, n, cost=1):
         for i in range(n):
-            member = Member(self)
-            self.members[member.id] = member
+            if self.spend(cost):
+                member = Member(self)
+                self.members[member.id] = member
+            else:
+                return False
+        return True
 
     # List the members and their stats
     def get_status(self):
@@ -79,15 +93,18 @@ class Gang:
         for n in self.members:
             member = self.members[n]
             print(f'{member.name} ({member.archetype}):\n    Level: {member.level} ({member.xp}/{(member.level+1)**2}) Gear: {member.gear}')
-        print('Rackets:')
+        print('\nRackets:')
         for n in self.rackets:
             racket = self.rackets[n]
-            print(f'{racket.name}:\n    Stored Cash: {racket.cash} Income: {racket.income}')
+            print(f'{racket.name}:\n    Income: {racket.income}')
+        print('\nAssets:')
+        for n in self.assets:
+            asset = self.assets[n]
+            print(f'{asset.name}:\n    Stored Cash: {asset.cash}')
         print('\n')
     
     # Checks if given id is in gang or gets random member
     # if id is not in gang returns False
-    # filter for min gear tier
     def get_member(self, id=None):
         if id is None:
             try:

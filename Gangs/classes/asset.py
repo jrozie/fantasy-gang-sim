@@ -9,13 +9,14 @@ class Asset:
     id = 0
     asset_dict = {}
 
-    def __init__(self):
+    def __init__(self, gang):
         self.name = 'Stash'
+        self.gang = gang
         self.can_store_cash = True
         self.can_store_items = False
         self.cash = 0
         self.inventory = {}
         
-        self.id = Racket.id
-        Racket.racket_dict[self.id] = self
-        Racket.id += 1
+        self.id = Asset.id
+        Asset.asset_dict[self.id] = self
+        Asset.id += 1
