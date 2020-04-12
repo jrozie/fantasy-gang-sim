@@ -55,7 +55,8 @@ class Member:
         self.name = dwarf.name()
         self.archetype = 'Thug'
         self.gang = gang
-        self.level = 0
+        self.level = 1
+        self.xp_requirement = (self.level)**2
         self.xp = 0
         self.gear = 0
         
@@ -66,12 +67,12 @@ class Member:
     # Give the gang member 1 xp if they aren't at the cap
     def get_xp(self):
         if self.level < 10:
-            xp_requirement = (self.level+1)**2
             self.xp += 1
-            if self.xp >= xp_requirement:
+            if self.xp >= self.xp_requirement:
                 self.xp = 0
                 self.level += 1
-            print(f'{self.name} is level {self.level}. ({self.xp}/{xp_requirement})\n')
+                self.xp_requirement = (self.level)**2
+            print(f'{self.name} is level {self.level}. ({self.xp}/{self.xp_requirement})\n')
 
     # Makes gang member the boss
     def make_boss(self):

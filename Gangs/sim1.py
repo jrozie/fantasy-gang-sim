@@ -14,14 +14,17 @@ from classes.asset import Asset
 gang1 = Gang('da dorfs')
 
 # %%
-strength = []
+strength_list = []
+
+# %%
 for i in range(0,10):
-    strength.append(gang1.get_strength())
     gang1.recruit(1)
+    gang1.train()
+    strength_list.append(gang1.get_strength())
 
-print(strength)
+print(strength_list)
 
-strength = pd.DataFrame(strength, columns=['Strength'])
+strength = pd.DataFrame(strength_list, columns=['Strength'])
 
 # %%
 fig = px.line(strength, y="Strength")

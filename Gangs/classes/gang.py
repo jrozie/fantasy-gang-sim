@@ -72,10 +72,10 @@ class Gang:
 
     # get total cash reserves
     def count_cash(self):
-        cash = 0
-        for n in self.assets:
-            cash += self.assets[n].cash
-        return cash
+        return sum(self.assets[n].cash for n in self.assets)
+
+    def count_income(self):
+        return sum(self.rackets[n].income for n in self.rackets)
 
     # Add [n] new members to self.members
     # Costs 1 cash
@@ -90,19 +90,19 @@ class Gang:
 
     # Gets Gang Strength
     def get_strength(self):
-        return len(self.members)
+        return sum(self.members[n].level for n in self.members)
 
     # List the members and their stats
     def get_status(self):
         print(f'{self.name}\nRoster:')
         for n in self.members:
             member = self.members[n]
-            print(f'{member.name} ({member.archetype}):\n    Level: {member.level} ({member.xp}/{(member.level+1)**2}) Gear: {member.gear}')
-        print('\nRackets:')
+            print(f'{member.name} ({member.archetype}):\n    Level: {member.level} ({member.xp}/{member.xp_requirement}) Gear: {member.gear}')
+        print(f'\nRackets:  Total Income: {self.count_income()}')
         for n in self.rackets:
             racket = self.rackets[n]
             print(f'{racket.name}:\n    Income: {racket.income}')
-        print('\nAssets:')
+        print(f'\nAssets:\n  Total Cash: {self.count_cash()}')
         for n in self.assets:
             asset = self.assets[n]
             print(f'{asset.name}:\n    Stored Cash: {asset.cash}')
@@ -119,7 +119,7 @@ class Gang:
         else:
             try:
                 member = self.members[id]
-            except IndexError:  # Not a valid id
+            except IndexError or KeyError:  # Not a valid id
                 return False
         return member
 
