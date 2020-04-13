@@ -1,3 +1,4 @@
+#%%
 import random
 
 
@@ -50,10 +51,10 @@ class Member:
     id = 0
     member_dict = {}
 
-    def __init__(self, gang):
+    def __init__(self, gang='Test'):
         dwarf = Namebase()
         self.name = dwarf.name()
-        self.archetype = 'Thug'
+        self.archetype = 'Test'
         self.gang = gang
         self.level = 1
         self.xp_requirement = (self.level)**2
@@ -79,3 +80,15 @@ class Member:
         self.archetype = 'Boss'
         # self.loyalty = 100
 
+class Thug(Member):
+    def __init__(self):
+        super().__init__()
+        self.archetype = 'Thug'
+
+class Boss(Member):
+    def __init__(self):
+        super().__init__()
+        self.archetype = 'Boss'
+
+
+# %%

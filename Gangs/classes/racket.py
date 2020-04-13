@@ -16,4 +16,5 @@ class Racket:
         Racket.id += 1
 
     def activate(self):
+        #This is bad - not sure if we use it yet but really it should return a result to pass it up the chain
         gang.earn(income)

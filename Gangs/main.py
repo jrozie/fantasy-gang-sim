@@ -6,8 +6,6 @@ Github:
 https://github.com/jrozie/fantasy-gang-sim
 '''
 # %%
-
-from classes.namebase import Namebase
 from classes.gang import Gang
 from classes.member import Member
 from classes.racket import Racket

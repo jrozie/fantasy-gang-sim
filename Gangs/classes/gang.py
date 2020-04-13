@@ -2,7 +2,8 @@
 import random
 from classes.racket import Racket
 from classes.asset import Asset
-from classes.member import Member
+from classes.member import Thug
+from classes.member import Boss
 
 class Gang:
     """
@@ -21,6 +22,7 @@ class Gang:
         self.add_asset()
         self.add_racket()
         self.earn(initial_members*3)
+        #self.recruit_boss()
         self.recruit(initial_members)
 
         self.boss = self.members[max(self.members, key=lambda x: self.members[x].level)]
@@ -82,10 +84,15 @@ class Gang:
     def recruit(self, n, cost=1):
         for i in range(n):
             if self.spend(cost):
-                member = Member(self)
+                member = Thug()
                 self.members[member.id] = member
             else:
                 return False
+        return True
+
+    def recruit_boss(self):
+        member = Boss()
+        self.members[member.id] = member
         return True
 
     # Gets Gang Strength
