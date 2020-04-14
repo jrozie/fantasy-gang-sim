@@ -41,6 +41,12 @@ class Namebase:
 
     def name(self):
         return random.choice(self.male_names + self.female_names) + ' ' + random.choice(self.surnames)
+    
+    def male_name(self):
+        return random.choice(self.male_names) + ' ' + random.choice(self.surnames)
+    
+    def female_name(self):
+        return random.choice(self.female_names) + ' ' + random.choice(self.surnames)
 
 class Member:
 
@@ -52,14 +58,22 @@ class Member:
     member_dict = {}
 
     def __init__(self, gang='Test'):
-        dwarf = Namebase()
-        self.name = dwarf.name()
+        namebase = Namebase()
+        self.gender = random.choices(['male', 'female', '?'], [1, 1, 0.1])
+        if self.gender == 'male':
+            self.name = namebase.male_name()
+        elif self.gender == 'female':
+            self.name = namebase.female_name()
+        else:
+            self.name = namebase.male_name()
         self.archetype = 'Test'
+        self.upkeep = 0
         self.gang = gang
         self.level = 1
         self.xp_requirement = (self.level)**2
         self.xp = 0
         self.gear = 0
+        self.assigned_to = None
         
         self.id = Member.id
         Member.member_dict[self.id] = self
@@ -73,22 +87,60 @@ class Member:
                 self.xp = 0
                 self.level += 1
                 self.xp_requirement = (self.level)**2
-            print(f'{self.name} is level {self.level}. ({self.xp}/{self.xp_requirement})\n')
+                print(f'{self.name} is now level {self.level}.')
+            # print(f'{self.name} is level {self.level}. ({self.xp}/{self.xp_requirement})\n')
 
     # Makes gang member the boss
-    def make_boss(self):
-        self.archetype = 'Boss'
-        # self.loyalty = 100
+    # def make_boss(self):
+    #     self.archetype = 'Boss'
+    #     # self.loyalty = 100
 
 class Thug(Member):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, gang):
+        super().__init__(gang)
         self.archetype = 'Thug'
+        self.upkeep = 1
+
+    def activate(self):
+        if self.assigned_to is None:
+            # If the thug doesn't have a job, will mug people for some cash and might gain xp
+            output = random.randint(0, self.level)
+            if random.randint(1, 10) >= 8:
+                self.get_xp()
+            print(f'{self.name} mugs people earning {output}.')
+            return 'cash', output
+        else:
+            return self.assigned_to.activate(self)
 
 class Boss(Member):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, gang):
+        super().__init__(gang)
         self.archetype = 'Boss'
+        self.upkeep = 10
+        self.assigned_to = 'Boss'
+
+    def activate(self):
+        # The Boss doesn't work Rackets, he makes them.
+        # Or recruits new members
+        available_cash = self.gang.count_cash()
+        actions = ['recruit', 'add racket']
+        recruit_worth = 2.71828 ** ((sum(self.gang.assets[n].slots for n in self.gang.assets) + sum(self.gang.rackets[n].slots for n in self.gang.rackets) - len(self.gang.members))/10)
+        if available_cash > 100:
+            racket_worth = available_cash / 100
+        else:
+            racket_worth = 0
+        action = random.choices(actions, [recruit_worth, racket_worth])[0]
+        if action == 'recruit':
+            output = min(random.randint(1, 5) + self.level, available_cash)
+            print(f'{self.name} tries to recruit {output} people.')
+        elif action == 'add racket':
+            output = 1
+            print(f'{self.name} sets up a new racket.')
+        else: 
+            output = None
+        return action, output
+        
+
 
 
 # %%

@@ -14,6 +14,7 @@ from classes.asset import Asset
 
 # def main():
 gang1 = Gang('da dorfs')
+gang1.activate()
 
 # %%
 

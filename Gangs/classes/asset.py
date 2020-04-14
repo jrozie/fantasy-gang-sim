@@ -16,7 +16,14 @@ class Asset:
         self.can_store_items = False
         self.cash = 0
         self.inventory = {}
+        self.assigned = []
+        self.slots = 5
         
         self.id = Asset.id
         Asset.asset_dict[self.id] = self
         Asset.id += 1
+    
+    def activate(self, activator):
+        # No effect, members are defending the asset
+        print(f'{activator.name} is guarding {self.name}.')
+        return None, None

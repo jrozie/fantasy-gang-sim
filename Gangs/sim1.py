@@ -12,14 +12,12 @@ from classes.asset import Asset
 
 # def main():
 gang1 = Gang('da dorfs')
-
-# %%
 strength_list = []
 
 # %%
 for i in range(0,10):
-    gang1.recruit(1)
-    gang1.train()
+    print(f'Day {i}')
+    gang1.activate()
     strength_list.append(gang1.get_strength())
 
 print(strength_list)
