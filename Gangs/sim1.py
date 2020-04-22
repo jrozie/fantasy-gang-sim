@@ -11,20 +11,26 @@ from classes.asset import Asset
 
 
 # def main():
-gang1 = Gang('da dorfs')
-strength_list = []
+Gang('da dorfs')
+Gang('da boiz')
+day = 1
+days = []
+# strengths = pd.DataFrame()
 
 # %%
-for i in range(0,10):
+
+for i in range(day, day+50):
     print(f'Day {i}')
-    gang1.activate()
-    strength_list.append(gang1.get_strength())
+    for gang_id in Gang.gang_dict:
+        gang = Gang.gang_dict[gang_id]
+        gang.activate()
+day = i+1
 
-print(strength_list)
-
-strength = pd.DataFrame(strength_list, columns=['Strength'])
 
 # %%
-fig = px.line(strength, y="Strength")
-fig.show()
+for gang_id in Gang.gang_dict:
+    gang = Gang.gang_dict[gang_id]
+    strength = pd.DataFrame(gang.strength_log, columns=['Strength'])
+    fig = px.line(strength, y="Strength", title=gang.name)
+    fig.show()
 # %%

@@ -1,5 +1,4 @@
 
-
 class Asset:
 
     """
@@ -10,14 +9,15 @@ class Asset:
     asset_dict = {}
 
     def __init__(self, gang):
-        self.name = 'Stash'
+        self.name = 'test'
         self.gang = gang
-        self.can_store_cash = True
+        self.can_store_cash = False
         self.can_store_items = False
         self.cash = 0
         self.inventory = {}
         self.assigned = []
-        self.slots = 5
+        self.slots = 0
+        self.priority = 1
         
         self.id = Asset.id
         Asset.asset_dict[self.id] = self
@@ -25,5 +25,22 @@ class Asset:
     
     def activate(self, activator):
         # No effect, members are defending the asset
-        print(f'{activator.name} is guarding {self.name}.')
+        self.gang.event_log.append(f'{activator.name} is guarding {self.name}.')
         return None, None
+
+
+class Stash(Asset):
+    def __init__(self, gang):
+        super().__init__(gang)
+        self.name = 'Stash'
+        self.can_store_cash = True
+        self.slots = 5
+
+
+class Headquarters(Asset):
+    def __init__(self, gang):
+        super().__init__(gang)
+        self.name = 'HQ'
+        self.can_store_cash = True
+        self.can_store_items = True
+        self.slots = 5

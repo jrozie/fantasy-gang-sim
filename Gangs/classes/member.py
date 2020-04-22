@@ -87,7 +87,7 @@ class Member:
                 self.xp = 0
                 self.level += 1
                 self.xp_requirement = (self.level)**2
-                print(f'{self.name} is now level {self.level}.')
+                self.gang.event_log.append(f'{self.name} is now level {self.level}.')
             # print(f'{self.name} is level {self.level}. ({self.xp}/{self.xp_requirement})\n')
 
     # Makes gang member the boss
@@ -96,6 +96,7 @@ class Member:
     #     # self.loyalty = 100
 
 class Thug(Member):
+    # Basic Gang Member
     def __init__(self, gang):
         super().__init__(gang)
         self.archetype = 'Thug'
@@ -107,17 +108,24 @@ class Thug(Member):
             output = random.randint(0, self.level)
             if random.randint(1, 10) >= 8:
                 self.get_xp()
-            print(f'{self.name} mugs people earning {output}.')
+            self.gang.event_log.append(f'{self.name} mugs people earning {output}.')
             return 'cash', output
         else:
             return self.assigned_to.activate(self)
 
+# class Thief(Member):
+#     # Thief
+#     def __init__(self, gang):
+#         super().__init__(gang)
+#         self.archetype = 'Thief'
+#         self.upkeep = 1
+
 class Boss(Member):
+    # Leads gang
     def __init__(self, gang):
         super().__init__(gang)
         self.archetype = 'Boss'
         self.upkeep = 10
-        self.assigned_to = 'Boss'
 
     def activate(self):
         # The Boss doesn't work Rackets, he makes them.
@@ -131,11 +139,11 @@ class Boss(Member):
             racket_worth = 0
         action = random.choices(actions, [recruit_worth, racket_worth])[0]
         if action == 'recruit':
-            output = min(random.randint(1, 5) + self.level, available_cash)
-            print(f'{self.name} tries to recruit {output} people.')
+            output = min(random.randint(0, self.level) + self.level, available_cash)
+            self.gang.event_log.append(f'{self.name} tries to recruit {output} people.')
         elif action == 'add racket':
             output = 1
-            print(f'{self.name} sets up a new racket.')
+            self.gang.event_log.append(f'{self.name} sets up a new racket.')
         else: 
             output = None
         return action, output

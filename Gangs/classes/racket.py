@@ -23,5 +23,5 @@ class Racket:
         # Update to provide items or materials etc
         if self.provides == 'cash':
             output = self.income
-        print(f'{activator.name} works at {self.name} earning {self.income}.')
+        self.gang.event_log.append(f'{activator.name} works at {self.name} earning {self.income}.')
         return self.provides, output

@@ -1,9 +1,8 @@
 #%%
 import random
 from classes.racket import Racket
-from classes.asset import Asset
-from classes.member import Thug
-from classes.member import Boss
+from classes.asset import Stash, Headquarters
+from classes.member import Thug, Boss
 
 class Gang:
     """
@@ -17,14 +16,19 @@ class Gang:
         self.name = name
         self.members = {}
         self.boss = None
+        self.headquarters = None
         self.rackets = {}
         self.assets = {}
+        self.recruitment = 0
+        self.event_log = []
+        self.strength_log = []
         
-        self.add_asset(cost=0)
+        self.add_hq(cost=0)
         self.add_racket(cost=0)
         self.earn(initial_members*3)
         self.recruit_boss()
         self.recruit(initial_members, cost=0)
+        self.activate(initial=True)
 
         # self.boss = self.members[max(self.members, key=lambda x: self.members[x].level)]
         # self.boss.make_boss()
@@ -44,12 +48,25 @@ class Gang:
         else:
             return False
 
-    # creates a new asset that stores cash/gear
-    def add_asset(self, cost=100):
+    # creates a new stash that stores cash
+    def add_stash(self, cost=100):
         if self.spend(cost):
-            asset = Asset(self)
+            asset = Stash(self)
             self.assets[asset.id] = asset
             return True
+        else:
+            return False
+
+    # creates a new HQ that stores cash/gear
+    def add_hq(self, cost=100):
+        if self.headquarters is None:
+            if self.spend(cost):
+                asset = Headquarters(self)
+                self.headquarters = asset
+                self.assets[asset.id] = asset
+                return True
+            else:
+                return False
         else:
             return False
 
@@ -114,7 +131,11 @@ class Gang:
         print(f'{self.name}\nRoster:')
         for n in self.members:
             member = self.members[n]
-            print(f'{member.name} ({member.archetype}):\n    Level: {member.level} ({member.xp}/{member.xp_requirement}) Gear: {member.gear}')
+            try:
+                job = member.assigned_to.name
+            except AttributeError:
+                job = 'Idle'
+            print(f'{member.name} ({member.archetype}): {job}\n    Level: {member.level} ({member.xp}/{member.xp_requirement}) Gear: {member.gear}')
         print(f'\nRackets:  Total Income: {self.count_income()}')
         for n in self.rackets:
             racket = self.rackets[n]
@@ -181,11 +202,12 @@ class Gang:
         if not member:
             return False
         if member == self.boss:
+            self.boss.assigned_to = self.headquarters
             return False
         assign_to = [None]
         weights = [1]
         for n in self.assets:
-            weight = self.assets[n].slots - len(self.assets[n].assigned)
+            weight = (self.assets[n].slots - len(self.assets[n].assigned))
             if weight > 0:
                 assign_to.append(self.assets[n])
                 weights.append(weight)
@@ -202,36 +224,39 @@ class Gang:
         else: 
             return False
 
-    # The gang members take their actions then pay upkeep
-    def activate(self):
-        # make sure members have a job then activate members
+    # Collect returns from last rounds actions and assign new jobs
+    def activate(self, initial=False):
+        if not initial:
+        
+            for n in self.members:
+                member = self.members[n]
+                resource, output = member.activate()
+                if resource == 'cash':
+                    self.earn(output)
+                elif resource == 'recruit':
+                    self.recruitment += output
+                elif resource == 'add racket':
+                    self.add_racket()
+            loyalty_check = []
+            for n in self.members:
+                member = self.members[n]
+                if not self.spend(member.upkeep):
+                    # hasn't been paid :(
+                    loyalty_check.append(n)
+            for n in loyalty_check:
+                if self.members[n] != self.boss:
+                    self.remove_member(n)
+            self.recruit(self.recruitment)
 
+        self.recruitment = 0
         for n in self.assets:
             self.assets[n].assigned = []
         for n in self.rackets:
             self.rackets[n].assigned = []
-        
-        recruitment = 0
         for n in self.members:
-            member = self.members[n]
             self.assign_member(n)
-            resource, output = member.activate()
-            if resource == 'cash':
-                self.earn(output)
-            elif resource == 'recruit':
-                recruitment += output
-            elif resource == 'add racket':
-                self.add_racket()
-        loyalty_check = []
-        for n in self.members:
-            member = self.members[n]
-            if not self.spend(member.upkeep):
-                # hasn't been paid :(
-                loyalty_check.append(n)
-        for n in loyalty_check:
-            if self.members[n] != self.boss:
-                self.remove_member(n)
-        self.recruit(recruitment)
+
+        self.strength_log.append(self.get_strength())
 
 
 
